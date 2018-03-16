@@ -4,20 +4,16 @@ function updateBalance() {
     callStrava(),
     callSteam(),
   ]).then(function(values) {
-  document.getElementById("fitness-value").innerHTML=values[0].toFixed(2);
-  document.getElementById("gaming-value").innerHTML=values[1].toFixed(2);
-  document.getElementById("balance-value").innerHTML=(values[0] - values[1]).toFixed(2);
-});
+    document.getElementById("fitness-value").innerHTML=values[0].toFixed(2);
+    document.getElementById("gaming-value").innerHTML=values[1].toFixed(2);
+    document.getElementById("balance-value").innerHTML=(values[0] - values[1]).toFixed(2);
+  });
 }
-
-// stravaMiles = 0
-// steamHours = 0
-
 
 // call strava api for total miles run
 function callStrava() {
   return new Promise(function(resolve, reject) {
-  fetch("https://www.strava.com/api/v3/athletes/4733270/stats?access_token=" + stravaToken, {})
+    fetch("https://www.strava.com/api/v3/athletes/4733270/stats?access_token=" + stravaToken, {})
     .then(function(response) {
       if (!response.ok) {
         console.log(response);
@@ -28,17 +24,17 @@ function callStrava() {
           resolve(stravaMiles)
         });
       };
-      }
-    ).catch(function(error) {
-      console.log(error);
-    });
-    })
+    }
+  ).catch(function(error) {
+    console.log(error);
+  });
+})
 }
 
 // call steam api for total hours played
 function callSteam() {
   return new Promise(function(resolve, reject) {
-  fetch("https://crossorigin.me/http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamKey + "&steamid=76561198001987954&include_played_free_games=1&format=json", {})
+    fetch("https://crossorigin.me/http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamKey + "&steamid=76561198001987954&include_played_free_games=1&format=json", {})
     .then(function(response) {
       if (!response.ok) {
         console.log(response);
