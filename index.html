@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Game Budget</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<script src="/api-keys.js"></script>
+
+</head>
+<body onload="updateBalance()">
+  <div id="container">
+    <div id="gaming">
+      <div class="section-title">
+        gaming
+      </div>
+      <div class="section-value" id="gaming-value">
+        0.00
+      </div>
+    </div>
+    <div id="fitness">
+      <div class="section-title">
+        fitness
+      </div>
+      <div class="section-value" id="fitness-value">
+        0.00
+      </div>
+    </div>
+    <div id="balance">
+      <div class="section-title">
+        balance
+      </div>
+      <div class="section-value" id="balance-value">
+        0.00
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+<style>
+*{
+	margin: 0;
+	padding: 0;
+}
+body {
+  background-color: green;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+#container {
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  width: 25vw;
+  justify-content: space-around;
+}
+
+.section-title {
+  background-color: red;
+}
+
+.section-value {
+  background-color: blue;
+  color: white;
+}
+
+</style>
+
+<script>
+
+// call both APIs and update html with responses
+function updateBalance() {
+  return Promise.all([
+    callStrava(),
+    callSteam(),
+  ]).then(function(values) {
+  document.getElementById("fitness-value").innerHTML=stravaMiles.toFixed(2);
+  document.getElementById("gaming-value").innerHTML=steamHours.toFixed(2);
+  document.getElementById("balance-value").innerHTML=(steamHours - stravaMiles).toFixed(2);
+});
+}
+
+stravaMiles = 0
+steamHours = 0
+
+
+// call strava api for total miles run
+function callStrava() {
+  return new Promise(function(resolve, reject) {
+  fetch("https://www.strava.com/api/v3/athletes/4733270/stats?access_token=" + stravaToken, {})
+    .then(function(response) {
+      if (!response.ok) {
+        console.log(response);
+      } else {
+        response.text().then(function(text) {
+          user = JSON.parse(text)
+          stravaMiles = (user.all_run_totals.distance / 1609.344).toFixed(2) - 67.44
+          resolve("callstrava resolved")
+        });
+      };
+      }
+    ).catch(function(error) {
+      console.log(error);
+    });
+    })
+}
+
+// call steam api for total hours played
+function callSteam() {
+  return new Promise(function(resolve, reject) {
+  fetch("https://crossorigin.me/http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + steamKey + "&steamid=76561198001987954&include_played_free_games=1&format=json", {})
+    .then(function(response) {
+      if (!response.ok) {
+        console.log(response);
+      } else {
+        response.text()
+        .then(function(text) {
+          user = JSON.parse(text)
+          steamHours = (user.response.games.map(x => x.playtime_forever).reduce((a, b) => a + b, 0) / 60).toFixed(2) - 1780.47
+          resolve("callsteam resolved")
+        });
+
+      };
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+  })
+}
+
+</script>
